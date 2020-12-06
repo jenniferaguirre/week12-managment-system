@@ -210,3 +210,32 @@ function addEmployee() {
     })
 }
 
+function updateEmployeeRole() {
+    connection.query("SELECT * FROM employee", function (err, employee) {
+        connection.query ("SELECT * FROM role", async function (err, role) {
+            const roleChoice = role.map ((role)=> ({
+                name:role.title,
+                value:role.id
+            }))
+            const employeeChoice = employee.map ((employee) => ({
+                name:employee.first_name + " " + employee.last_name,
+                value:employee.id
+            }))
+            const updateEmployee = await inquirer.prompt([
+                {
+                    type: "list",
+                    name: "employee_id",
+                    message: "Which employee's role would you like to update?",
+                    choices:employeeChoice
+                },
+                {
+                    type: "list",
+                    name: "role_id",
+                    message: "What new role would you like to assign to that employee?",
+                    choices:roleChoice
+                }
+            ])
+            connection.query (`update employee set role_id=${updateEmployee.role_id} where id=${updateEmployee.employee_id}`, printResults)
+        })
+    })
+}
